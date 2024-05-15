@@ -16,7 +16,7 @@
 
 #include "../../../HTAL.h"
 
-#if defined (__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+// #if defined (__AVR_ATmega16__) || defined(__AVR_ATmega32__)
 
 #ifndef F_CPU
 	/*!
@@ -26,7 +26,7 @@
 	 *
 	 *	Must called before any include of Atmel files.
 	 */
-	#define F_CPU 1000000UL 
+	#define F_CPU 16000000UL 
 #endif
 
 #include <avr/io.h>
@@ -58,7 +58,8 @@ void HTAL_PhysicalTimerInit(void)
 	 *
 	 * So, in this code, our base timing is 1ms for each tick.
 	 **/
-	TCCR0 = (1<<FOC0)|(1 << WGM01)|(1<<CS02)|(1<<CS00);
+    TCCR0A = (1 << WGM01);
+    TCCR0B = (1 << FOC0A) | (1 << CS02) | (1 << CS00);
 }
 
 void HTAL_startPhysicalTimer(long timePeriodMilliSec,
@@ -70,24 +71,24 @@ void HTAL_startPhysicalTimer(long timePeriodMilliSec,
 	gUserTimerCallbackArg	= userTimerCallbackArg;
 
 	/* Setting the initial value for the timer to zero.	*/
-	TCNT0 = 0x00;
+	TCNT0 = 0;
 	/* Enable global interrupt (bit:7 in SREG).*/
 	sei();
 	/*
 	 * We will set the compare value to 1 tick, since it will overflow after 1 ms
 	 * which gives us the capability to count up a time greater > 1 ms by the variable (gNumberOf_1ms_passed)
 	 */
-	OCR0 = 0x01;
+	OCR0A = 16;
 	/* Enable the compare match interrupt bit mask.
      * When we set the OCIE0 bit and I bit (global interrupt), the interrupt for this timer is enabled.
      */
-	TIMSK |= (1 << OCIE0);
+	TIMSK0 |= (1 << OCIE0A);
 }
 
 void HTAL_stopPhysicalTimer(void)
 {
 	/* Disable the interrupt for this timer.	*/
-	TIMSK &= ~(1 << OCIE0);
+	TIMSK0 &= ~(1 << OCIE0A);
 }
 
 
@@ -113,7 +114,7 @@ void HTAL_changeUserTimerCallBack(void (*userTimerCallBack)(void *),
  * 
  * Here we disable the nested interrupts.
 */
-ISR(TIMER0_COMP_vect)
+ISR(TIMER0_COMPA_vect)
 {
 
 	++gNumberOf_1ms_passed;
@@ -131,4 +132,4 @@ ISR(TIMER0_COMP_vect)
 	}
 }
 
-#endif /*	__AVR_ATmega16__ or __AVR_ATmega32__	*/
+// #endif /*	__AVR_ATmega16__ or __AVR_ATmega32__	*/

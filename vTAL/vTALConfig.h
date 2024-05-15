@@ -18,7 +18,7 @@ typedef unsigned short      VTAL_tTimerId;
 typedef long       VTAL_tTimeSec;
 typedef long       VTAL_tTimeMilliSec;
 
-#define NUMBER_OF_TIMERS    (10u)
+#define NUMBER_OF_TIMERS    (2u)
     /*!  
      *  TIMER_ID_<ID_Number> 
      * The <ID_Number> is not the index of the timer inside vTAL. it just for which timer 
